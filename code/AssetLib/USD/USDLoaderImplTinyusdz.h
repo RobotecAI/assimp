@@ -156,6 +156,8 @@ public:
             aiScene *pScene,
             size_t meshIdx,
             const std::string &nameWExt);
+private:
+    std::vector<aiMaterial *> m_meshMaterials;
 };
 } // namespace Assimp
 #endif // AI_USDLOADER_IMPL_TINYUSDZ_H_INCLUDED

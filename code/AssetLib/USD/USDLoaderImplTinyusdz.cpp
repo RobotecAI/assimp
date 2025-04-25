@@ -322,6 +322,28 @@ void USDImporterImplTinyusdz::materialsForMesh(
         size_t meshIdx,
         const std::string &nameWExt) {
     UNUSED(render_scene); UNUSED(pScene); UNUSED(meshIdx); UNUSED(nameWExt);
+
+    // traverse through render scene meshes and collect all meshes that have displayColor set
+
+    aiMaterial *out_mat = new aiMaterial();
+    m_meshMaterials.push_back(out_mat);
+
+    auto displayColor = render_scene.meshes[meshIdx].displayColor;
+    aiColor3D diffuse;
+    diffuse.r = displayColor.r;
+    diffuse.g = displayColor.g;
+    diffuse.b = displayColor.b;
+    out_mat->AddProperty(&diffuse, 1, AI_MATKEY_COLOR_DIFFUSE);
+
+    aiString s;
+    std::string materialName = std::string(AI_DEFAULT_MATERIAL_NAME) + "_" + std::to_string(meshIdx);
+    s.Set(materialName);
+
+    out_mat->AddProperty(&s, AI_MATKEY_NAME);
+
+    if (render_scene.meshes[meshIdx].material_id == -1) {
+        pScene->mMeshes[meshIdx]->mMaterialIndex = render_scene.materials.size() + meshIdx;
+    }
 }
 
 void USDImporterImplTinyusdz::uvsForMesh(
@@ -406,10 +428,11 @@ void USDImporterImplTinyusdz::materials(
     ss << "materials(): model" << nameWExt << ", numMaterials: " << numMaterials;
     TINYUSDZLOGD(TAG, "%s", ss.str().c_str());
     pScene->mNumMaterials = 0;
-    if (render_scene.materials.empty()) {
+    if (render_scene.materials.empty() && m_meshMaterials.empty()) {
+        TINYUSDZLOGE(TAG, "%s", "Empty material list");
         return;
     }
-    pScene->mMaterials = new aiMaterial *[render_scene.materials.size()];
+    pScene->mMaterials = new aiMaterial *[render_scene.materials.size() + m_meshMaterials.size()];
     for (const auto &material : render_scene.materials) {
         ss.str("");
         ss << "    material[" << pScene->mNumMaterials << "]: name: |" << material.name << "|, disp name: |" << material.display_name << "|";
@@ -429,6 +452,7 @@ void USDImporterImplTinyusdz::materials(
         mat->AddProperty(
                 ownedColorPtrFor(material.surfaceShader.emissiveColor.value),
                 1, AI_MATKEY_COLOR_EMISSIVE);
+
 
         ss.str("");
         if (material.surfaceShader.diffuseColor.is_texture()) {
@@ -485,6 +509,14 @@ void USDImporterImplTinyusdz::materials(
         }
 
         pScene->mMaterials[pScene->mNumMaterials] = mat;
+        ++pScene->mNumMaterials;
+    }
+
+    for (auto* meshMat: m_meshMaterials) {
+        ss.str("");
+        ss << "    material[" << pScene->mNumMaterials << "]: name: |" << meshMat->GetName().C_Str() << "|";
+        TINYUSDZLOGD(TAG, "%s", ss.str().c_str());
+        pScene->mMaterials[pScene->mNumMaterials] = meshMat;
         ++pScene->mNumMaterials;
     }
 }
