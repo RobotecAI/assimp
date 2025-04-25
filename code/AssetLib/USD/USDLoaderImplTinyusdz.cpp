@@ -2,7 +2,7 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2024, assimp team
+Copyright (c) 2006-2025, assimp team
 
 All rights reserved.
 
@@ -236,6 +236,7 @@ void USDImporterImplTinyusdz::meshes(
         //   - apple "toy car" canopy normals will be wrong
         //   - human "untitled" model (tinyusdz issue #115) will be "splotchy"
         normalsForMesh(render_scene, pScene, meshIdx, nameWExt);
+        colorsForMesh(render_scene, pScene, meshIdx, nameWExt);
         materialsForMesh(render_scene, pScene, meshIdx, nameWExt);
         uvsForMesh(render_scene, pScene, meshIdx, nameWExt);
     }
@@ -288,6 +289,30 @@ void USDImporterImplTinyusdz::normalsForMesh(
         pScene->mMeshes[meshIdx]->mNormals[vertIdx].x = floatPtr[fpj];
         pScene->mMeshes[meshIdx]->mNormals[vertIdx].y = floatPtr[fpj + 1];
         pScene->mMeshes[meshIdx]->mNormals[vertIdx].z = floatPtr[fpj + 2];
+    }
+}
+
+void USDImporterImplTinyusdz::colorsForMesh(
+        const tinyusdz::tydra::RenderScene &render_scene,
+        aiScene *pScene,
+        size_t meshIdx,
+        const std::string &nameWExt) {
+    UNUSED(nameWExt);
+
+    //TODO: for reference only - taken from PLY
+    // if (haveColor) {
+    //     if (nullptr == mGeneratedMesh->mColors[0])
+    //         mGeneratedMesh->mColors[0] = new aiColor4D[mGeneratedMesh->mNumVertices];
+    //     mGeneratedMesh->mColors[0][pos] = cOut;
+    // }
+    auto displayColor = render_scene.meshes[meshIdx].displayColor;
+    aiColor4D colorToApply;
+    colorToApply.r = displayColor.r;
+    colorToApply.g = displayColor.g;
+    colorToApply.b = displayColor.b;
+    pScene->mMeshes[meshIdx]->mColors[0] = new aiColor4D[pScene->mMeshes[meshIdx]->mNumVertices];
+    for (size_t vertIdx = 0; vertIdx < pScene->mMeshes[meshIdx]->mNumVertices; ++vertIdx) {
+        pScene->mMeshes[meshIdx]->mColors[0][vertIdx] = colorToApply;
     }
 }
 

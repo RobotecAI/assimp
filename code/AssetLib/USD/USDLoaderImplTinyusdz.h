@@ -88,6 +88,12 @@ public:
             size_t meshIdx,
             const std::string &nameWExt);
 
+    void colorsForMesh(
+            const tinyusdz::tydra::RenderScene &render_scene,
+            aiScene *pScene,
+            size_t meshIdx,
+            const std::string &nameWExt);
+
     void materialsForMesh(
             const tinyusdz::tydra::RenderScene &render_scene,
             aiScene *pScene,
