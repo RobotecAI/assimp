@@ -947,7 +947,9 @@ IF (ASSIMP_BUILD_USD_IMPORTER)
     #       name can lead to non-deterministic (unpredictable) results since the code is potentially
     #       in flux
     # "dev" branch, 9 Jul 2024
-    set(TINYUSDZ_GIT_TAG "bd2a1edbbf69f352a6c40730114db9918c384848")
+    #set(TINYUSDZ_GIT_TAG "bd2a1edbbf69f352a6c40730114db9918c384848")
+    # "dev" branch, 23 Apr 2025
+    set(TINYUSDZ_GIT_TAG "eda8ad06e5aa407d2d5b651bb9cb89cb8be141b3")
     message("****")
     message("\n\n**** Cloning tinyusdz repo, git tag ${TINYUSDZ_GIT_TAG}\n\n")
 
@@ -1257,12 +1259,8 @@ IF( MSVC OR "${CMAKE_CXX_SIMULATE_ID}" MATCHES "MSVC") # clang with MSVC ABI
 endif ()
 
 IF(NOT ASSIMP_HUNTER_ENABLED)
-  if (UNZIP_FOUND)
-    SET (unzip_compile_SRCS "")
-  else ()
     SET (unzip_compile_SRCS ${unzip_SRCS})
     INCLUDE_DIRECTORIES( "../contrib/unzip/" )
-  endif ()
 ENDIF()
 
 MESSAGE(STATUS "Enabled importer formats:${ASSIMP_IMPORTERS_ENABLED}")
@@ -1528,17 +1526,7 @@ ENDIF()
 # Build against external unzip, or add ../contrib/unzip so
 # assimp can #include "unzip.h"
 IF(NOT ASSIMP_HUNTER_ENABLED)
-  if (UNZIP_FOUND)
-    INCLUDE_DIRECTORIES(${UNZIP_INCLUDE_DIRS})
-    # TODO if cmake required version has been updated to >3.12.0, collapse this to the second case only
-    if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-      TARGET_LINK_LIBRARIES(assimp ${UNZIP_LIBRARIES})
-    else()
-      TARGET_LINK_LIBRARIES(assimp ${UNZIP_LINK_LIBRARIES})
-    endif()
-  else ()
     INCLUDE_DIRECTORIES("../")
-  endif ()
 ENDIF()
 
 # Add RT-extension library for glTF importer with Open3DGC-compression.
