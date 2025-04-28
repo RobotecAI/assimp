@@ -949,12 +949,14 @@ IF (ASSIMP_BUILD_USD_IMPORTER)
     # "dev" branch, 9 Jul 2024
     #set(TINYUSDZ_GIT_TAG "bd2a1edbbf69f352a6c40730114db9918c384848")
     # "dev" branch, 23 Apr 2025
-    set(TINYUSDZ_GIT_TAG "eda8ad06e5aa407d2d5b651bb9cb89cb8be141b3")
+    #set(TINYUSDZ_GIT_TAG "eda8ad06e5aa407d2d5b651bb9cb89cb8be141b3")
+    # custom branch for integration
+    set(TINYUSDZ_GIT_TAG "fee27553f09abd71970609b0a4be5c4bd45efbd1")
     message("****")
     message("\n\n**** Cloning tinyusdz repo, git tag ${TINYUSDZ_GIT_TAG}\n\n")
 
-    # Patch required to build arm32 on android
-    set(TINYUSDZ_PATCH_CMD git apply ${Tinyusdz_BASE_ABSPATH}/patches/tinyusdz.patch)
+    # Patch is already applied in the custom branch required to build arm32 on android
+#    set(TINYUSDZ_PATCH_CMD git apply ${Tinyusdz_BASE_ABSPATH}/patches/tinyusdz.patch)
 
     # Note: CMake's "FetchContent" (which executes at configure time) is much better for this use case
     #       than "ExternalProject" (which executes at build time); we just want to clone a repo and
@@ -967,7 +969,7 @@ IF (ASSIMP_BUILD_USD_IMPORTER)
     set(FETCHCONTENT_UPDATES_DISCONNECTED on) # Prevent other ABIs from re-cloning/re-patching etc
     FetchContent_Declare(
             tinyusdz_repo
-            GIT_REPOSITORY "https://github.com/lighttransport/tinyusdz"
+            GIT_REPOSITORY "https://github.com/RobotecAI/tinyusdz"
             GIT_TAG        ${TINYUSDZ_GIT_TAG}
             PATCH_COMMAND  ${TINYUSDZ_PATCH_CMD}
     )
